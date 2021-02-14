@@ -8,5 +8,6 @@ load_dotenv(env_file)
 
 
 class Config:
-    DEGUB = True
+    DEBUG = True
     SECRET_KEY = os.environ.get('SECRET_KEY')
+
