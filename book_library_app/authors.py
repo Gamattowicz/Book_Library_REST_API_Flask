@@ -5,11 +5,11 @@ from book_library_app.models import Author, AuthorSchema, author_schema
 from book_library_app.utils import validate_json_content_type
 
 
-
 @app.route('/api/v1/authors', methods=['GET'])
 def get_authors():
     authors = Author.query.all()
-    author_schema = AuthorSchema(many=True)
+    schema_args = Author.get_schema_args(request.args.get('fields'))
+    author_schema = AuthorSchema(**schema_args)
 
     return jsonify({
         'success': True,
@@ -62,6 +62,11 @@ def update_author(args: dict, author_id: int):
 
 @app.route('/api/v1/authors/<int:author_id>', methods=['DELETE'])
 def delete_author(author_id: int):
+    author = Author.query.get_or_404(author_id, description=f'Author with id {author_id} not found')
+
+    db.session.delete(author)
+    db.session.commit()
+
     return jsonify({
         'success': True,
         'data': f'Author with id {author_id} has been deleted'
