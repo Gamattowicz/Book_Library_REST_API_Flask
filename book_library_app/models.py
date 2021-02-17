@@ -1,5 +1,9 @@
-from datetime import datetime, date
+import jwt
+from flask import current_app
+
+from datetime import datetime, date, timedelta
 from marshmallow import Schema, fields, validate, validates, ValidationError
+from werkzeug.security import generate_password_hash
 
 from book_library_app import db
 
@@ -51,6 +55,17 @@ class User(db.Model):
     email = db.Column(db.String(255), nullable=False, unique=True)
     password = db.Column(db.String(255), nullable=False)
     creation_date = db.Column(db.DateTime, default=datetime.utcnow)
+
+    @staticmethod
+    def generate_hashed_password(password: str) -> str:
+        return generate_password_hash(password)
+
+    def generate_jwt(self) -> bytes:
+        payload = {
+            'user_id': self.id,
+            'exp': datetime.utcnow() + timedelta(minutes=current_app.config.get('JWT_EXPIRED_MINUTES', 30))
+        }
+        return jwt.encode(payload, current_app.config.get('SECRET_KEY'))
 
 
 class AuthorSchema(Schema):
