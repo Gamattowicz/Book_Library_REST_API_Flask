@@ -71,4 +71,6 @@ class BookSchema(Schema):
         if len(str(value)) != 13:
             ValidationError('ISBN must contains 13 digits')
 
+
 author_schema = AuthorSchema()
+book_schema = BookSchema()
